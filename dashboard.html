@@ -32,6 +32,14 @@
       rel="stylesheet"
       href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker3.min.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"
+    ></script>
     <style>
       .pt-12 {
         padding-top: 12px;
@@ -206,6 +214,16 @@
         height: 36px !important;
         padding: 0 10px !important;
       }
+      .input-daterange .form-control {
+        border-radius: 4px !important;
+      }
+      .btn-search {
+        background-color: #3c3839;
+        color: white;
+        border-radius: 4px;
+        border: 0;
+        padding: 0 15px;
+      }
       @media screen and (max-width: 960px) {
         .app-mainBody {
           padding: 0;
@@ -240,12 +258,40 @@
       </div>
       <div class="app-mainBody">
         <div class="app-header"></div>
+
         <div class="app-mainContent">
-          <table
-            class="dataTable table table-striped display nowrap"
-            id="example"
-            style="width: 100%"
-          ></table>
+          <div>
+            <div class="col-md-6 px-0 pull-right mb-4">
+              <div class="input-group input-daterange">
+                <input
+                  type="text"
+                  id="min-date"
+                  class="form-control"
+                  data-date-format="yyyy-mm-dd"
+                  placeholder="From:"
+                />
+                <div class="input-group-addon mx-2">to</div>
+                <input
+                  type="text"
+                  id="max-date"
+                  class="form-control"
+                  data-date-format="yyyy-mm-dd"
+                  placeholder="To:"
+                  value="2022-12-31"
+                />
+                <button type="button" id="search" class="ml-3 btn-search">
+                  Search
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="app-tableContent">
+            <table
+              class="dataTable table table-striped display nowrap"
+              id="example"
+              style="width: 100%"
+            ></table>
+          </div>
         </div>
         <div class="app-extra-space"></div>
         <div class="app-footer"></div>
@@ -266,6 +312,10 @@
       src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"
     ></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
@@ -296,6 +346,9 @@
       }
       data = removeDuplicates(data, "date")
       $(document).ready(function () {
+        $(".input-daterange input").each(function () {
+          $(this).datepicker("clearDates")
+        })
         // let results = JSON.parse(
         // window.localStorage.getItem("submissions")
         let activeDomain = $(".aside-content button.active")
@@ -322,6 +375,22 @@
                   : [...Object.values(d.form_data)].length > 4 &&
                     d.form_data.domain === `Honest-Budget-for-${activeDomain}`
               )
+              .filter((d) => {
+                return moment($("#max-date").val()) &&
+                  moment($("#min-date").val())
+                  ? moment(d.submitted_at.date.substring(0, 11)).isBefore(
+                      moment($("#max-date").val())
+                    ) &&
+                      moment(d.submitted_at.date.substring(0, 11)).isAfter(
+                        moment($("#min-date").val())
+                      )
+                  : moment(d.submitted_at.date.substring(0, 11)).isBefore(
+                      moment("2022-12-31")
+                    ) &&
+                      moment(d.submitted_at.date.substring(0, 11)).isAfter(
+                        moment("2022-01-01")
+                      )
+              })
               .map((d) => {
                 return [
                   ...DATA.map((colName) => d.form_data[colName] || "--"),
@@ -491,8 +560,8 @@
           if (myTable != undefined && myTable != null) {
             myTable.destroy()
             myTable = null
-            $(".app-mainContent").html("")
-            $(".app-mainContent").append(
+            $(".app-tableContent").html("")
+            $(".app-tableContent").append(
               '<table class="dataTable table table-striped display nowrap" id="example" style="width: 100%"></table>'
             )
             InitializeDataTables()
@@ -522,6 +591,9 @@
           filterData(activeDomain)
         })
         $("#contact-details").click()
+        $("#search").on("click", function () {
+          filterData(activeDomain)
+        })
         // $.getJSON(
         //   "https://formsubmit.co/api/get-submissions/65ca8aa4da5df3c490abd5e1c1a854cfc09164edbac56c898d5cfc5c9ba26609",
         //   function (data) {
