@@ -198,6 +198,14 @@
       table.dataTable thead th {
         border-bottom: 1px solid #ebedf2 !important;
       }
+      .dt-buttons button.dt-button {
+        border: 1px solid #ebedf2 !important;
+        background-image: none !important;
+        border-radius: 4px !important;
+        background-color: white !important;
+        height: 36px !important;
+        padding: 0 10px !important;
+      }
       @media screen and (max-width: 960px) {
         .app-mainBody {
           padding: 0;
@@ -260,17 +268,33 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+
+    <link
+      href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
     <script src="./data.js"></script>
     <script defer>
       function removeDuplicates(array, key) {
-        let lookup = new Set();
+        let lookup = new Set()
         return array.filter(
           (obj) =>
             !lookup.has(obj.submitted_at[key]) &&
             lookup.add(obj.submitted_at[key])
-        );
+        )
       }
-      data = removeDuplicates(data, "date");
+      data = removeDuplicates(data, "date")
       $(document).ready(function () {
         // let results = JSON.parse(
         // window.localStorage.getItem("submissions")
@@ -278,13 +302,14 @@
           .text()
           .trim()
           .toLowerCase()
-          .replaceAll(" ", "-");
-        let COLUMNS = [];
-        let DATA = [];
-        var results = [];
-        var myTable;
+          .replaceAll(" ", "-")
+        let COLUMNS = []
+        let DATA = []
+        var results = []
+        var myTable
         function InitializeDataTables() {
           myTable = $("#example").DataTable({
+            dom: "Bfrtip",
             sPaginationType: "full_numbers",
             data: data
               .filter((d) =>
@@ -302,16 +327,17 @@
                   ...DATA.map((colName) => d.form_data[colName] || "--"),
                   d.submitted_at.date.substring(0, 11),
                   d.submitted_at.date.substring(11, 16),
-                ];
+                ]
                 console.log([
                   ...DATA.map((colName) => d.form_data[colName] || "--"),
                   d.submitted_at.date.substring(0, 11),
                   d.submitted_at.date.substring(11, 16),
-                ]);
+                ])
               }),
             columns: COLUMNS,
+            buttons: ["csv", "excel", "pdf", "print"],
             scrollX: true,
-          });
+          })
         }
 
         const filterData = (activeDomain) => {
@@ -324,9 +350,9 @@
                 { title: "Domain" },
                 { title: "Date" },
                 { title: "Time" },
-              ];
-              DATA = ["name", "Mobile_No_", "email", "domain"];
-              break;
+              ]
+              DATA = ["name", "Mobile_No_", "email", "domain"]
+              break
 
             case "DESIGNSESSION":
               COLUMNS = [
@@ -336,9 +362,9 @@
                 { title: "Domain" },
                 { title: "Date" },
                 { title: "Time" },
-              ];
-              DATA = ["name", "Mobile_No_", "email", "domain"];
-              break;
+              ]
+              DATA = ["name", "Mobile_No_", "email", "domain"]
+              break
             case "APARTMENTRENOVATION":
               COLUMNS = [
                 { title: "Name" },
@@ -352,7 +378,7 @@
                 { title: "Total No Of Rooms" },
                 { title: "Date" },
                 { title: "Time" },
-              ];
+              ]
               DATA = [
                 "name",
                 "mobile",
@@ -363,12 +389,8 @@
                 "Apartment_Size_In_Sq_Ft",
                 "Total_No__Of_Bathrooms",
                 "Total_No__Of_Rooms",
+              ]
 
-              ];
-
-        
-
- 
               break
 
             case "BATHROOMRENOVATION":
@@ -384,7 +406,7 @@
                 { title: "Width in feet" },
                 { title: "Date" },
                 { title: "Time" },
-              ];
+              ]
               DATA = [
                 "name",
                 "mobile",
@@ -395,9 +417,8 @@
                 "Total_No__Of_Bathrooms",
                 "Length_in_feet",
                 "Width_in_feet:",
-              
-              ];
-              break;
+              ]
+              break
             case "KITCHENCONSTRUCTION":
               COLUMNS = [
                 { title: "Name" },
@@ -411,7 +432,7 @@
                 { title: "Width in feet" },
                 { title: "Date" },
                 { title: "Time" },
-              ];
+              ]
               DATA = [
                 "name",
                 "mobile",
@@ -422,13 +443,9 @@
                 "Kitchen_Shape",
                 "Length_in_feet",
                 "Width_in_feet:",
+              ]
 
-              ];
-
-              break;
-
-              
-              
+              break
 
             case "NEWHOUSECONSTRUCTION":
               COLUMNS = [
@@ -447,7 +464,7 @@
                 { title: "No Of Floors" },
                 { title: "Date" },
                 { title: "Time" },
-              ];
+              ]
               DATA = [
                 "name",
                 "mobile",
@@ -462,52 +479,49 @@
                 "Total_No__of_Rooms",
                 "basement",
                 "nooffloors",
+              ]
 
-              ];
+              break
 
-              break;
-
-             
-              
             default:
-              COLUMNS = [];
-              DATA = [];
-              break;
+              COLUMNS = []
+              DATA = []
+              break
           }
           if (myTable != undefined && myTable != null) {
-            myTable.destroy();
-            myTable = null;
-            $(".app-mainContent").html("");
+            myTable.destroy()
+            myTable = null
+            $(".app-mainContent").html("")
             $(".app-mainContent").append(
               '<table class="dataTable table table-striped display nowrap" id="example" style="width: 100%"></table>'
-            );
-            InitializeDataTables();
+            )
+            InitializeDataTables()
           } else {
-            InitializeDataTables();
+            InitializeDataTables()
           }
-        };
+        }
 
         $(".aside-content").on("click", "button", function () {
-          $(".aside-content button.active").removeClass("active");
-          $(this).addClass("active");
+          $(".aside-content button.active").removeClass("active")
+          $(this).addClass("active")
           activeDomain = $(this)
             .text()
             .trim()
             .toLowerCase()
-            .replaceAll(" ", "-");
-          filterData(activeDomain);
-        });
+            .replaceAll(" ", "-")
+          filterData(activeDomain)
+        })
         $("#contact-details").on("click", "button", function () {
-          $(".aside-content button.active").removeClass("active");
-          $(this).addClass("active");
+          $(".aside-content button.active").removeClass("active")
+          $(this).addClass("active")
           activeDomain = $(this)
             .text()
             .trim()
             .toLowerCase()
-            .replaceAll(" ", "-");
-          filterData(activeDomain);
-        });
-        $("#contact-details").click();
+            .replaceAll(" ", "-")
+          filterData(activeDomain)
+        })
+        $("#contact-details").click()
         // $.getJSON(
         //   "https://formsubmit.co/api/get-submissions/65ca8aa4da5df3c490abd5e1c1a854cfc09164edbac56c898d5cfc5c9ba26609",
         //   function (data) {
@@ -523,7 +537,7 @@
         //     }
         //   }
         // );
-      });
+      })
     </script>
   </body>
 </html>
