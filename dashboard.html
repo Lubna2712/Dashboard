@@ -32,14 +32,15 @@
       rel="stylesheet"
       href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
     />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker3.min.css"
-    />
     <script
       type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"
+      src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"
     ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+    />
     <style>
       .pt-12 {
         padding-top: 12px;
@@ -261,29 +262,7 @@
 
         <div class="app-mainContent">
           <div>
-            <div class="col-md-6 px-0 pull-right mb-4">
-              <div class="input-group input-daterange">
-                <input
-                  type="text"
-                  id="min-date"
-                  class="form-control"
-                  data-date-format="yyyy-mm-dd"
-                  placeholder="From:"
-                />
-                <div class="input-group-addon mx-2">to</div>
-                <input
-                  type="text"
-                  id="max-date"
-                  class="form-control"
-                  data-date-format="yyyy-mm-dd"
-                  placeholder="To:"
-                  value="2022-12-31"
-                />
-                <button type="button" id="search" class="ml-3 btn-search">
-                  Search
-                </button>
-              </div>
-            </div>
+            <input type="text" name="daterange" />
           </div>
           <div class="app-tableContent">
             <table
@@ -313,16 +292,20 @@
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
     ></script>
-    <script
+    <!-- <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"
-    ></script>
+    ></script> -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
+    ></script>
 
     <link
       href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"
@@ -337,30 +320,71 @@
     <script src="./data.js"></script>
     <script defer>
       function removeDuplicates(array, key) {
-        let lookup = new Set()
+        let lookup = new Set();
         return array.filter(
           (obj) =>
             !lookup.has(obj.submitted_at[key]) &&
             lookup.add(obj.submitted_at[key])
-        )
+        );
       }
-      data = removeDuplicates(data, "date")
+      data = removeDuplicates(data, "date");
       $(document).ready(function () {
-        $(".input-daterange input").each(function () {
-          $(this).datepicker("clearDates")
-        })
+        var start = moment();
+        var end = moment();
+        // $(".input-daterange input").each(function () {
+        //   $(this).datepicker("clearDates");
+        // });
+        $('input[name="daterange"]').daterangepicker(
+          {
+            showDropdowns: true,
+            ranges: {
+              Today: [moment(), moment()],
+              Yesterday: [
+                moment().subtract(1, "days"),
+                moment().subtract(1, "days"),
+              ],
+              "Last 7 Days": [moment().subtract(6, "days"), moment()],
+              "Last 30 Days": [moment().subtract(29, "days"), moment()],
+              "This Month": [
+                moment().startOf("month"),
+                moment().endOf("month"),
+              ],
+              "Last Month": [
+                moment().subtract(1, "month").startOf("month"),
+                moment().subtract(1, "month").endOf("month"),
+              ],
+            },
+            alwaysShowCalendars: true,
+            startDate: start,
+            endDate: end,
+          },
+          function (s, e, label) {
+            start = s;
+            end = e;
+            console.log(
+              "New date range selected: " +
+                s.format("YYYY-MM-DD") +
+                " to " +
+                e.format("YYYY-MM-DD") +
+                " (predefined range: " +
+                label +
+                ")"
+            );
+            filterData(activeDomain, s, e);
+          }
+        );
         // let results = JSON.parse(
         // window.localStorage.getItem("submissions")
         let activeDomain = $(".aside-content button.active")
           .text()
           .trim()
           .toLowerCase()
-          .replaceAll(" ", "-")
-        let COLUMNS = []
-        let DATA = []
-        var results = []
-        var myTable
-        function InitializeDataTables() {
+          .replaceAll(" ", "-");
+        let COLUMNS = [];
+        let DATA = [];
+        var results = [];
+        var myTable;
+        function InitializeDataTables(start, end) {
           myTable = $("#example").DataTable({
             dom: "Bfrtip",
             sPaginationType: "full_numbers",
@@ -376,40 +400,32 @@
                     d.form_data.domain === `Honest-Budget-for-${activeDomain}`
               )
               .filter((d) => {
-                return moment($("#max-date").val()) &&
-                  moment($("#min-date").val())
-                  ? moment(d.submitted_at.date.substring(0, 11)).isBefore(
-                      moment($("#max-date").val())
-                    ) &&
-                      moment(d.submitted_at.date.substring(0, 11)).isAfter(
-                        moment($("#min-date").val())
-                      )
-                  : moment(d.submitted_at.date.substring(0, 11)).isBefore(
-                      moment("2022-12-31")
-                    ) &&
-                      moment(d.submitted_at.date.substring(0, 11)).isAfter(
-                        moment("2022-01-01")
-                      )
+                return (
+                  moment(d.submitted_at.date).format("x") >=
+                    moment(start).startOf("day").format("x") &&
+                  moment(d.submitted_at.date).format("x") <=
+                    moment(end).endOf("day").format("x")
+                );
               })
               .map((d) => {
                 return [
                   ...DATA.map((colName) => d.form_data[colName] || "--"),
                   d.submitted_at.date.substring(0, 11),
-                  d.submitted_at.date.substring(11, 16),
-                ]
+                  d.submitted_at.date.substring(11, 19),
+                ];
                 console.log([
                   ...DATA.map((colName) => d.form_data[colName] || "--"),
                   d.submitted_at.date.substring(0, 11),
-                  d.submitted_at.date.substring(11, 16),
-                ])
+                  d.submitted_at.date.substring(11, 19),
+                ]);
               }),
             columns: COLUMNS,
             buttons: ["csv", "excel", "pdf", "print"],
             scrollX: true,
-          })
+          });
         }
 
-        const filterData = (activeDomain) => {
+        const filterData = (activeDomain, start, end) => {
           switch (activeDomain.replaceAll("-", "").toUpperCase()) {
             case "CONTACTDETAILS":
               COLUMNS = [
@@ -419,9 +435,9 @@
                 { title: "Domain" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
-              DATA = ["name", "Mobile_No_", "email", "domain"]
-              break
+              ];
+              DATA = ["name", "Mobile_No_", "email", "domain"];
+              break;
 
             case "DESIGNSESSION":
               COLUMNS = [
@@ -431,9 +447,9 @@
                 { title: "Domain" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
-              DATA = ["name", "Mobile_No_", "email", "domain"]
-              break
+              ];
+              DATA = ["name", "Mobile_No_", "email", "domain"];
+              break;
             case "APARTMENTRENOVATION":
               COLUMNS = [
                 { title: "Name" },
@@ -447,7 +463,7 @@
                 { title: "Total No Of Rooms" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
+              ];
               DATA = [
                 "name",
                 "mobile",
@@ -458,9 +474,9 @@
                 "Apartment_Size_In_Sq_Ft",
                 "Total_No__Of_Bathrooms",
                 "Total_No__Of_Rooms",
-              ]
+              ];
 
-              break
+              break;
 
             case "BATHROOMRENOVATION":
               COLUMNS = [
@@ -475,7 +491,7 @@
                 { title: "Width in feet" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
+              ];
               DATA = [
                 "name",
                 "mobile",
@@ -486,8 +502,8 @@
                 "Total_No__Of_Bathrooms",
                 "Length_in_feet",
                 "Width_in_feet:",
-              ]
-              break
+              ];
+              break;
             case "KITCHENCONSTRUCTION":
               COLUMNS = [
                 { title: "Name" },
@@ -501,7 +517,7 @@
                 { title: "Width in feet" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
+              ];
               DATA = [
                 "name",
                 "mobile",
@@ -512,9 +528,9 @@
                 "Kitchen_Shape",
                 "Length_in_feet",
                 "Width_in_feet:",
-              ]
+              ];
 
-              break
+              break;
 
             case "NEWHOUSECONSTRUCTION":
               COLUMNS = [
@@ -533,7 +549,7 @@
                 { title: "No Of Floors" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
+              ];
               DATA = [
                 "name",
                 "mobile",
@@ -548,52 +564,54 @@
                 "Total_No__of_Rooms",
                 "basement",
                 "nooffloors",
-              ]
+              ];
 
-              break
+              break;
 
             default:
-              COLUMNS = []
-              DATA = []
-              break
+              COLUMNS = [];
+              DATA = [];
+              break;
           }
           if (myTable != undefined && myTable != null) {
-            myTable.destroy()
-            myTable = null
-            $(".app-tableContent").html("")
+            myTable.destroy();
+            myTable = null;
+            $(".app-tableContent").html("");
             $(".app-tableContent").append(
               '<table class="dataTable table table-striped display nowrap" id="example" style="width: 100%"></table>'
-            )
-            InitializeDataTables()
+            );
+            InitializeDataTables(start, end);
           } else {
-            InitializeDataTables()
+            InitializeDataTables(start, end);
           }
-        }
-
+        };
+        console.log(start, end, "data", daterangepicker);
         $(".aside-content").on("click", "button", function () {
-          $(".aside-content button.active").removeClass("active")
-          $(this).addClass("active")
+          $(".aside-content button.active").removeClass("active");
+          $(this).addClass("active");
           activeDomain = $(this)
             .text()
             .trim()
             .toLowerCase()
-            .replaceAll(" ", "-")
-          filterData(activeDomain)
-        })
+            .replaceAll(" ", "-");
+          filterData(activeDomain, start, end);
+        });
         $("#contact-details").on("click", "button", function () {
-          $(".aside-content button.active").removeClass("active")
-          $(this).addClass("active")
+          $(".aside-content button.active").removeClass("active");
+          $(this).addClass("active");
           activeDomain = $(this)
             .text()
             .trim()
             .toLowerCase()
-            .replaceAll(" ", "-")
-          filterData(activeDomain)
-        })
-        $("#contact-details").click()
-        $("#search").on("click", function () {
-          filterData(activeDomain)
-        })
+            .replaceAll(" ", "-");
+          filterData(activeDomain, start, end);
+        });
+        $("#contact-details").click();
+        // filterData(activeDomain);
+
+        // $("#search").on("click", function () {
+        //   filterData(activeDomain);
+        // });
         // $.getJSON(
         //   "https://formsubmit.co/api/get-submissions/65ca8aa4da5df3c490abd5e1c1a854cfc09164edbac56c898d5cfc5c9ba26609",
         //   function (data) {
@@ -609,7 +627,7 @@
         //     }
         //   }
         // );
-      })
+      });
     </script>
   </body>
 </html>
