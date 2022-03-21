@@ -32,14 +32,18 @@
       rel="stylesheet"
       href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"
     />
-    <script
-      type="text/javascript"
-      src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"
-    ></script>
     <link
       rel="stylesheet"
       type="text/css"
       href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"
+    />
+    <link
+      href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css"
+      rel="stylesheet"
     />
     <style>
       .pt-12 {
@@ -283,6 +287,10 @@
       crossorigin="anonymous"
     ></script>
     <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"
+    ></script>
+    <script
       src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
       integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
       crossorigin="anonymous"
@@ -292,10 +300,6 @@
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
     ></script>
-    <!-- <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"
-    ></script> -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
@@ -306,16 +310,6 @@
       type="text/javascript"
       src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"
     ></script>
-
-    <link
-      href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css"
-      rel="stylesheet"
-    />
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
     <script src="./data.js"></script>
     <script defer>
@@ -327,13 +321,14 @@
             lookup.add(obj.submitted_at[key])
         );
       }
-      data = removeDuplicates(data, "date");
+      data = removeDuplicates(
+        JSON.parse(window.localStorage.getItem("submissions")) || data,
+        "date"
+      );
       $(document).ready(function () {
         var start = moment();
         var end = moment();
-        // $(".input-daterange input").each(function () {
-        //   $(this).datepicker("clearDates");
-        // });
+
         $('input[name="daterange"]').daterangepicker(
           {
             showDropdowns: true,
@@ -373,8 +368,7 @@
             filterData(activeDomain, s, e);
           }
         );
-        // let results = JSON.parse(
-        // window.localStorage.getItem("submissions")
+
         let activeDomain = $(".aside-content button.active")
           .text()
           .trim()
@@ -617,26 +611,24 @@
           filterData(activeDomain, start, end);
         });
         $("#contact-details").click();
-        // filterData(activeDomain);
 
-        // $("#search").on("click", function () {
-        //   filterData(activeDomain);
-        // });
-        // $.getJSON(
-        //   "https://formsubmit.co/api/get-submissions/65ca8aa4da5df3c490abd5e1c1a854cfc09164edbac56c898d5cfc5c9ba26609",
-        //   function (data) {
-        //     if (data) {
-        //       console.log(data);
-        //       if (data.success) {
-        //         results = data;
-        //         window.localStorage.setItem(
-        //           "submissions",
-        //           JSON.stringify(data.submissions)
-        //         );
-        //       }
-        //     }
-        //   }
-        // );
+        if (!window.localStorage.getItem("submissions")) {
+          $.getJSON(
+            "https://formsubmit.co/api/get-submissions/d13566f50fb5ae439de357541fd44a5ba69f261ebce3c76c362df3d02d2cc733",
+            function (data) {
+              if (data) {
+                console.log(data);
+                if (data.success) {
+                  results = data;
+                  window.localStorage.setItem(
+                    "submissions",
+                    JSON.stringify(data.submissions)
+                  );
+                }
+              }
+            }
+          );
+        }
       });
     </script>
   </body>
