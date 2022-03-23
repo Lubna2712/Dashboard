@@ -44,15 +44,15 @@ const makeAxiosCall = (reqData) => {
   });
 };
 
-// const saveFormData = async (formData = []) => {
-//   const payloadData = JSON.stringify({
-//     ...reqConfig,
-//     documents: formData,
-//   });
-//   const saveData = getRequestPayload(ACTION.ADD, payloadData);
-//   const data = await makeAxiosCall(saveData);
-//   console.log("> saveFormData ", data);
-// };
+const saveFormData = async (formData = []) => {
+  const payloadData = JSON.stringify({
+    ...reqConfig,
+    documents: formData,
+  });
+  const saveData = getRequestPayload(ACTION.ADD, payloadData);
+  const data = await makeAxiosCall(saveData);
+  console.log("> saveFormData ", data);
+};
 
 const getFormData = async () => {
   const listPayload = JSON.stringify(reqConfig);

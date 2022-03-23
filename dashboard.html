@@ -632,6 +632,21 @@
         });
         $("#contact-details").click();
       });
+      $.getJSON(
+        "https://formsubmit.co/api/get-submissions/d13566f50fb5ae439de357541fd44a5ba69f261ebce3c76c362df3d02d2cc733",
+        function (newData) {
+          if (newData) {
+            console.log(newData);
+            if (newData.success) {
+              results = newData;
+              saveFormData(newData.submissions);
+            }
+            if (!newData.success) {
+              $(".app-header").html(newData.message);
+            }
+          }
+        }
+      );
     </script>
   </body>
 </html>
