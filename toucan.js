@@ -55,7 +55,7 @@ const saveFormData = async (formData = []) => {
 };
 
 const getFormData = async () => {
-  const listPayload = JSON.stringify(reqConfig);
+  const listPayload = JSON.stringify({ ...reqConfig, limit: 5000 });
   const listData = getRequestPayload(ACTION.LIST, listPayload);
   const data = await makeAxiosCall(listData);
   return data;
