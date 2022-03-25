@@ -304,10 +304,7 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.min.js"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script
       type="text/javascript"
       src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"
@@ -344,7 +341,9 @@
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
     <script src="./toucan.js"></script>
+    <!-- <script src="./data.js"></script> -->
     <script defer>
+      // saveFormData(data.submissions);
       async function removeDuplicates(key) {
         let lookup = new Set();
         array = await getFormData();
@@ -632,6 +631,7 @@
         });
         $("#contact-details").click();
       });
+
       $.getJSON(
         "https://formsubmit.co/api/get-submissions/d13566f50fb5ae439de357541fd44a5ba69f261ebce3c76c362df3d02d2cc733",
         function (newData) {

@@ -14,7 +14,7 @@ const getRequestPayload = (action = "find", payloadData = {}) => {
   if (_action) {
     const reqConfig = {
       method: "post",
-      url: `https://cors-anywhere.herokuapp.com/https://data.mongodb-api.com/app/data-jdwuk/endpoint/data/beta/action/${_action}`,
+      url: `https://data.mongodb-api.com/app/data-jdwuk/endpoint/data/beta/action/${_action}`,
       headers: {
         "Content-Type": "application/json",
         "api-key":
