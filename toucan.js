@@ -1,32 +1,14 @@
-const ACTION = {
-  LIST: "find",
-  ADD: "insertMany",
-};
+const getRequestPayload = () => {
+  const reqConfig = {
+    method: "get",
+    url: `https://hippostores.herokuapp.com/api/v2/data`,
+    headers: {
+      "Content-Type": "application/json",
+      hkey: "RHNmMjRSRUZmdmZIcTEyMG95QHNtcTh3cjJ0amVmbVtwc2M/bERHZEdSUSQjQCQjJEZFI3Q=",
+    },
+  };
 
-const reqConfig = {
-  dataSource: "Cluster0",
-  database: "toucan-dev",
-  collection: "submissions",
-};
-
-const getRequestPayload = (action = "find", payloadData = {}) => {
-  const _action = action;
-  if (_action) {
-    const reqConfig = {
-      method: "post",
-      url: `https://cors-anywhere.herokuapp.com/https://data.mongodb-api.com/app/data-jdwuk/endpoint/data/beta/action/${_action}`,
-      headers: {
-        "Content-Type": "application/json",
-        "api-key":
-          "h7alkz3tWTK9L3IymPeO6bIz6aEJAOXtz0iyl1XZtFke0Bb5NDu8nrU9HUs8UTzL",
-      },
-      data: payloadData,
-    };
-
-    return reqConfig;
-  } else {
-    return false;
-  }
+  return reqConfig;
 };
 
 const makeAxiosCall = (reqData) => {
@@ -37,26 +19,16 @@ const makeAxiosCall = (reqData) => {
       headers: reqData.headers,
     })
       .then((response) => response.json())
-      .then((data) => resolve(data.documents))
+      .then((data) => {
+        return resolve(data.data);
+      })
       .catch(function (error) {
         return reject(error);
       });
   });
 };
-
-const saveFormData = async (formData = []) => {
-  const payloadData = JSON.stringify({
-    ...reqConfig,
-    documents: formData,
-  });
-  const saveData = getRequestPayload(ACTION.ADD, payloadData);
-  const data = await makeAxiosCall(saveData);
-  console.log("> saveFormData ", data);
-};
-
 const getFormData = async () => {
-  const listPayload = JSON.stringify({ ...reqConfig, limit: 5000 });
-  const listData = getRequestPayload(ACTION.LIST, listPayload);
+  const listData = getRequestPayload();
   const data = await makeAxiosCall(listData);
   return data;
 };
