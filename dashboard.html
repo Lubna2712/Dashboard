@@ -247,9 +247,30 @@
         background-position-y: 35%;
         font-size: 18px;
       }
+      .app-header-mobile {
+        display: none;
+      }
       @media screen and (max-width: 768px) {
-        .app-aside {
+        .hide {
           display: none;
+        }
+        .app-header {
+          top: 10px;
+          width: 94%;
+        }
+        .app-header-mobile {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+        .logo-img {
+          filter: none;
+        }
+        .logo-wrapper {
+          border-bottom: 1px solid #eff0f6;
+          background-color: #ffffff;
+          transition: none;
         }
       }
     </style>
@@ -259,7 +280,7 @@
   <body class="">
     <div class="se-pre-con">Loading . . .</div>
     <div class="app-main">
-      <div class="app-aside">
+      <div class="app-aside hide">
         <div class="logo-wrapper">
           <img src="images/logo.png" height="40px" class="logo-img" />
         </div>
@@ -278,7 +299,14 @@
       </div>
       <div class="app-mainBody">
         <div class="app-mainContent">
-          <div class="app-header"></div>
+          <div class="app-header">
+            <div class="app-header-mobile">
+              <img src="images/logo.png" height="40px" class="logo-img" />
+              <div class="menu-click" onclick="openMenu()">
+                <img src="images/menu.png" height="30px" />
+              </div>
+            </div>
+          </div>
           <div>
             <input type="text" name="daterange" />
           </div>
@@ -324,6 +352,7 @@
     ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
     <script src="./toucan.js"></script>
+    <script src="./offcanvas.js"></script>
     <script defer>
       async function removeDuplicates(key) {
         let lookup = new Set()
