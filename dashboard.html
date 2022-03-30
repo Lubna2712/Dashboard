@@ -96,14 +96,10 @@
         background-color: #f2f3f8;
       }
       .app-header {
-        /* position: fixed;
-        top: 0;
-        right: 0;
-        left: 0;
-        z-index: 97; */
         position: absolute;
         top: 15px;
         color: red;
+        padding: 0 10px;
       }
       .app-aside {
         position: fixed;
@@ -115,6 +111,7 @@
         background-color: #ffffff;
         -webkit-transition: all 0.3s ease;
         transition: all 0.6s ease;
+        box-shadow: 0 0 20px 20px rgb(0 0 0 / 6%);
       }
       .app-aside {
         width: 265px;
@@ -150,6 +147,8 @@
         align-items: center;
         width: 100%;
         cursor: pointer;
+        text-indent: 0;
+        transition: all 0.4s ease-in-out;
       }
       .aside-content button:hover {
         background-color: #f2f3f8;
@@ -251,8 +250,15 @@
         display: none;
       }
       @media screen and (max-width: 768px) {
-        .hide {
-          display: none;
+        .hide,
+        .hide li,
+        .hide button {
+          width: 0px;
+          padding: 0;
+          text-indent: -1000px;
+        }
+        .hide.app-aside {
+          box-shadow: none;
         }
         .app-header {
           top: 10px;
@@ -302,7 +308,7 @@
           <div class="app-header">
             <div class="app-header-mobile">
               <img src="images/logo.png" height="40px" class="logo-img" />
-              <div class="menu-click" onclick="openMenu()">
+              <div class="menu-click" onclick="toggleMenu()">
                 <img src="images/menu.png" height="30px" />
               </div>
             </div>
@@ -354,20 +360,23 @@
     <script src="./toucan.js"></script>
     <script src="./offcanvas.js"></script>
     <script defer>
+      function toggleMenu() {
+        $(".app-aside").toggleClass("hide");
+      }
       async function removeDuplicates(key) {
-        let lookup = new Set()
-        array = await getFormData()
+        let lookup = new Set();
+        array = await getFormData();
         return array.filter(
           (obj) =>
             !lookup.has(obj.submitted_at[key]) &&
             lookup.add(obj.submitted_at[key])
-        )
+        );
       }
 
       $(document).ready(function () {
-        var start = moment()
-        var end = moment()
-        let data = removeDuplicates("date")
+        var start = moment();
+        var end = moment();
+        let data = removeDuplicates("date");
         $('input[name="daterange"]').daterangepicker(
           {
             showDropdowns: true,
@@ -393,8 +402,8 @@
             endDate: end,
           },
           function (s, e, label) {
-            start = s
-            end = e
+            start = s;
+            end = e;
             console.log(
               "New date range selected: " +
                 s.format("YYYY-MM-DD") +
@@ -403,20 +412,20 @@
                 " (predefined range: " +
                 label +
                 ")"
-            )
-            filterData(activeDomain, s, e)
+            );
+            filterData(activeDomain, s, e);
           }
-        )
+        );
 
         let activeDomain = $(".aside-content button.active")
           .text()
           .trim()
           .toLowerCase()
-          .replaceAll(" ", "-")
-        let COLUMNS = []
-        let DATA = []
-        var results = []
-        var myTable
+          .replaceAll(" ", "-");
+        let COLUMNS = [];
+        let DATA = [];
+        var results = [];
+        var myTable;
         function InitializeDataTables(start, end, data) {
           myTable = $("#example").DataTable({
             dom: "Bfrtip",
@@ -438,19 +447,19 @@
                     moment(start).startOf("day").format("x") &&
                   moment(d.submitted_at.date).format("x") <=
                     moment(end).endOf("day").format("x")
-                )
+                );
               })
               .map((d) => {
                 return [
                   ...DATA.map((colName) => d.form_data[colName] || "--"),
                   d.submitted_at.date.substring(0, 11),
                   d.submitted_at.date.substring(11, 19),
-                ]
+                ];
               }),
             columns: COLUMNS,
             buttons: ["csv", "excel", "print"],
             scrollX: true,
-          })
+          });
         }
 
         const filterData = (activeDomain, start, end) => {
@@ -463,9 +472,9 @@
                 { title: "Domain" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
-              DATA = ["name", "Mobile_No_", "email", "domain"]
-              break
+              ];
+              DATA = ["name", "Mobile_No_", "email", "domain"];
+              break;
 
             case "DESIGNSESSION":
               COLUMNS = [
@@ -475,9 +484,9 @@
                 { title: "Domain" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
-              DATA = ["name", "Mobile_No_", "email", "domain"]
-              break
+              ];
+              DATA = ["name", "Mobile_No_", "email", "domain"];
+              break;
             case "APARTMENTRENOVATION":
               COLUMNS = [
                 { title: "Name" },
@@ -491,7 +500,7 @@
                 { title: "Total No Of Rooms" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
+              ];
               DATA = [
                 "name",
                 "mobile",
@@ -502,9 +511,9 @@
                 "Apartment_Size_In_Sq_Ft",
                 "Total_No__Of_Bathrooms",
                 "Total_No__Of_Rooms",
-              ]
+              ];
 
-              break
+              break;
 
             case "BATHROOMRENOVATION":
               COLUMNS = [
@@ -519,7 +528,7 @@
                 { title: "Width in feet" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
+              ];
               DATA = [
                 "name",
                 "mobile",
@@ -530,8 +539,8 @@
                 "Total_No__Of_Bathrooms",
                 "Length_in_feet",
                 "Width_in_feet:",
-              ]
-              break
+              ];
+              break;
             case "KITCHENCONSTRUCTION":
               COLUMNS = [
                 { title: "Name" },
@@ -545,7 +554,7 @@
                 { title: "Width in feet" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
+              ];
               DATA = [
                 "name",
                 "mobile",
@@ -556,9 +565,9 @@
                 "Kitchen_Shape",
                 "Length_in_feet",
                 "Width_in_feet:",
-              ]
+              ];
 
-              break
+              break;
 
             case "NEWHOUSECONSTRUCTION":
               COLUMNS = [
@@ -577,7 +586,7 @@
                 { title: "No Of Floors" },
                 { title: "Date" },
                 { title: "Time" },
-              ]
+              ];
               DATA = [
                 "name",
                 "mobile",
@@ -592,55 +601,55 @@
                 "Total_No__of_Rooms",
                 "basement",
                 "nooffloors",
-              ]
+              ];
 
-              break
+              break;
 
             default:
-              COLUMNS = []
-              DATA = []
-              break
+              COLUMNS = [];
+              DATA = [];
+              break;
           }
           if (myTable != undefined && myTable != null) {
-            myTable.destroy()
-            myTable = null
-            $(".app-tableContent").html("")
+            myTable.destroy();
+            myTable = null;
+            $(".app-tableContent").html("");
             $(".app-tableContent").append(
               '<table class="dataTable table table-striped display nowrap" id="example" style="width: 100%"></table>'
-            )
+            );
             data.then((d) => {
-              InitializeDataTables(start, end, d)
-              $(".se-pre-con").fadeOut("slow")
-            })
+              InitializeDataTables(start, end, d);
+              $(".se-pre-con").fadeOut("slow");
+            });
           } else {
             data.then((d) => {
-              InitializeDataTables(start, end, d)
-              $(".se-pre-con").fadeOut("slow")
-            })
+              InitializeDataTables(start, end, d);
+              $(".se-pre-con").fadeOut("slow");
+            });
           }
-        }
+        };
         $(".aside-content").on("click", "button", function () {
-          $(".aside-content button.active").removeClass("active")
-          $(this).addClass("active")
+          $(".aside-content button.active").removeClass("active");
+          $(this).addClass("active");
           activeDomain = $(this)
             .text()
             .trim()
             .toLowerCase()
-            .replaceAll(" ", "-")
-          filterData(activeDomain, start, end)
-        })
+            .replaceAll(" ", "-");
+          filterData(activeDomain, start, end);
+        });
         $("#contact-details").on("click", "button", function () {
-          $(".aside-content button.active").removeClass("active")
-          $(this).addClass("active")
+          $(".aside-content button.active").removeClass("active");
+          $(this).addClass("active");
           activeDomain = $(this)
             .text()
             .trim()
             .toLowerCase()
-            .replaceAll(" ", "-")
-          filterData(activeDomain, start, end)
-        })
-        $("#contact-details").click()
-      })
+            .replaceAll(" ", "-");
+          filterData(activeDomain, start, end);
+        });
+        $("#contact-details").click();
+      });
     </script>
   </body>
 </html>
