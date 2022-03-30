@@ -111,7 +111,6 @@
         background-color: #ffffff;
         -webkit-transition: all 0.3s ease;
         transition: all 0.6s ease;
-        box-shadow: 0 0 20px 20px rgb(0 0 0 / 6%);
       }
       .app-aside {
         width: 265px;
@@ -128,7 +127,7 @@
         padding: 15px 20px;
         border-bottom: 1px solid #eff0f6;
         background-color: #3c3839;
-        transition: all 0.6s ease;
+        transition: all 0.4s ease;
       }
       .logo-img {
         filter: invert(1) grayscale(1) brightness(3);
@@ -149,6 +148,10 @@
         cursor: pointer;
         text-indent: 0;
         transition: all 0.4s ease-in-out;
+      }
+
+      .app-aside .logo-wrapper img {
+        text-indent: 0;
       }
       .aside-content button:hover {
         background-color: #f2f3f8;
@@ -250,13 +253,22 @@
         display: none;
       }
       @media screen and (max-width: 768px) {
+        .app-aside {
+          box-shadow: 0 0 20px 10px rgb(0 0 0 / 6%);
+        }
         .hide,
         .hide li,
-        .hide button {
+        .hide button,
+        .hide.app-aside .logo-wrapper img {
           width: 0px;
           padding: 0;
           text-indent: -1000px;
         }
+        .hide.app-aside .logo-wrapper {
+          width: 0;
+          padding: 0;
+        }
+
         .hide.app-aside {
           box-shadow: none;
         }
