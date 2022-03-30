@@ -206,8 +206,25 @@
         height: 36px !important;
         padding: 0 10px !important;
       }
-      .input-daterange .form-control {
-        border-radius: 4px !important;
+      .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+      .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        border: 1px solid #ebedf2 !important;
+        background: #f2f3f8;
+        padding: 3px 12px;
+        border-radius: 4px;
+      }
+
+      .dataTables_wrapper .dataTables_paginate .paginate_button,
+      .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        padding: 3px 12px;
+        border-radius: 4px;
+      }
+      .dataTables_wrapper .dataTables_scroll {
+        padding-top: 10px;
+      }
+      .dataTables_wrapper .dataTables_info,
+      .dataTables_wrapper .dataTables_paginate {
+        padding-top: 20px;
       }
       .btn-search {
         background-color: #3c3839;
@@ -223,6 +240,17 @@
         .app-mainContent {
           margin-top: 60px;
           padding: 10px;
+        }
+
+        div.dt-buttons,
+        .dataTables_paginate,
+        .dataTables_filter,
+        .dataTables_info {
+          text-align: left !important;
+        }
+        .dataTables_filter label,
+        .dataTables_filter input {
+          width: 100%;
         }
       }
       .no-js #loader {
@@ -251,9 +279,6 @@
         background-position-y: 35%;
         font-size: 18px;
       }
-      .loader-body {
-      }
-
       .loader-body {
         position: absolute;
         top: 40%;
@@ -491,6 +516,12 @@
         }
       }
       /* Loader */
+      .date-input {
+        border: 1px solid #ebedf2 !important;
+        margin-bottom: 20px;
+        padding: 5px 20px;
+        border-radius: 4px;
+      }
       .app-header-mobile {
         display: none;
       }
@@ -588,7 +619,7 @@
             </div>
           </div>
           <div>
-            <input type="text" name="daterange" />
+            <input type="text" name="daterange" class="date-input" />
           </div>
           <div class="app-tableContent">
             <table
